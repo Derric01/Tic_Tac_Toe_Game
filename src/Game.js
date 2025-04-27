@@ -5,11 +5,11 @@ function Game() {
   const [history, setHistory] = useState([{ squares: Array(9).fill(null) }]);
   const [xIsNext, setXIsNext] = useState(true);
   const [stepNumber, setStepNumber] = useState(0);
-  const [winner, setWinner] = useState(null); // Initialize winner state
+  const [winner, setWinner] = useState(null);
+  const [isDraw, setIsDraw] = useState(false); // NEW
 
   const handleClick = (i) => {
-    // Prevent clicking if game is won or square is already filled
-    if (winner || history[stepNumber]?.squares[i]) return;
+    if (winner || history[stepNumber]?.squares[i] || isDraw) return;
 
     const newHistory = history.slice(0, stepNumber + 1);
     const squares = newHistory[newHistory.length - 1].squares.slice();
@@ -18,10 +18,12 @@ function Game() {
     setStepNumber(newHistory.length);
     setXIsNext(!xIsNext);
 
-    // Check for winner after the move
     const currentWinner = calculateWinner(squares);
     if (currentWinner) {
-      setWinner(currentWinner); // Set winner only if there's a winner
+      setWinner(currentWinner);
+      setIsDraw(false); // no draw if winner
+    } else if (!squares.includes(null)) {
+      setIsDraw(true); // if no winner and no empty cells -> draw
     }
   };
 
@@ -39,17 +41,18 @@ function Game() {
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return squares[a]; // Return 'X' or 'O' as the winner
+        return squares[a];
       }
     }
-    return null; // No winner
+    return null;
   };
 
   const handleReset = () => {
     setHistory([{ squares: Array(9).fill(null) }]);
     setStepNumber(0);
     setXIsNext(true);
-    setWinner(null); // Reset winner on game reset
+    setWinner(null);
+    setIsDraw(false); // reset draw too
   };
 
   const currentSquares = history[stepNumber] ? history[stepNumber].squares : Array(9).fill(null);
@@ -60,6 +63,8 @@ function Game() {
       <div className="status">
         {winner
           ? `Winner: ${winner}`
+          : isDraw
+          ? "It's a Draw! 🤝"
           : `Next Player: ${xIsNext ? 'X' : 'O'}`}
       </div>
       <Board squares={currentSquares} onClick={handleClick} />
