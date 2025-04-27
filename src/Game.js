@@ -62,7 +62,7 @@ function Game() {
       <h1 className="game-title">Tic Tac Toe</h1>
       <div className="status">
         {winner
-          ? `Winner: ${winner}`
+          ? `Winner: ${winner} 🔥`
           : isDraw
           ? "It's a Draw! 🤝"
           : `Next Player: ${xIsNext ? 'X' : 'O'}`}
